@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shutter | سیستم پرامپت‌ساز حرفه‌ای عکاسی</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#08070c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Shutter">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<style>
+  :root{
+    --bg:#08070c;
+    --bg-panel:#131019;
+    --bg-panel-2:#1b1724;
+    --border:#2c2836;
+    --text:#f2efe9;
+    --text-dim:#9a94a8;
+
+    --blue:#4f7dff;
+    --purple:#b24ff0;
+    --gold:#ffb347;
+    --pink:#ff4f7d;
+
+    --accent:#ffb347;
+    --accent-soft:#ffb34722;
+    --accent-deep:#ff4f7d;
+    --accent-deep-soft:#ff4f7d22;
+
+    --grad: linear-gradient(120deg, var(--blue), var(--purple) 55%, var(--gold));
+    --grad-soft: linear-gradient(120deg, #4f7dff22, #b24ff022 55%, #ffb34722);
+
+    --radius:12px;
+    --mono:'Courier New', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, #4f7dff17, transparent 60%),
+      radial-gradient(ellipse 900px 500px at 100% 0%, #ffb34714, transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Vazirmatn','IRANSans',-apple-system,'Segoe UI',Tahoma,sans-serif;
+    line-height:1.7;
+    min-height:100vh;
+  }
+  body.lang-en{font-family:-apple-system,'Segoe UI',Inter,Arial,sans-serif;}
+  a{color:var(--gold);}
+  ::selection{ background:var(--purple); color:#fff; }
+
+  @keyframes floatGlow{
+    0%,100%{ transform:translateY(0px); filter:drop-shadow(0 0 14px #b24ff055) drop-shadow(0 0 24px #4f7dff33); }
+    50%{ transform:translateY(-5px); filter:drop-shadow(0 0 22px #ffb34766) drop-shadow(0 0 30px #b24ff044); }
+  }
+  @keyframes shimmer{
+    0%{ background-position:0% 50%; }
+    100%{ background-position:200% 50%; }
+  }
+  @keyframes pulseRing{
+    0%{ box-shadow:0 0 0 0 #b24ff055; }
+    70%{ box-shadow:0 0 0 8px #b24ff000; }
+    100%{ box-shadow:0 0 0 0 #b24ff000; }
+  }
+  @keyframes fadeInUp{
+    from{ opacity:0; transform:translateY(6px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  header{
+    padding:44px 24px 32px;
+    border-bottom:1px solid var(--border);
+    position:relative;
+    overflow:hidden;
+  }
+  header::before{
+    content:'';
+    position:absolute; inset:0;
+    background:var(--grad-soft);
+    background-size:200% 200%;
+    animation:shimmer 12s linear infinite alternate;
+    pointer-events:none;
+  }
+  .header-inner{
+    max-width:1180px;
+    margin:0 auto;
+    display:flex;
+    align-items:flex-start;
+    gap:28px;
+    position:relative;
+    z-index:1;
+  }
+  .app-icon{
+    flex:none;
+    width:76px;
+    height:76px;
+    border-radius:20px;
+    animation:floatGlow 4.5s ease-in-out infinite;
+  }
+  .header-text{flex:1;}
+  h1{
+    font-size:clamp(20px,3vw,30px);
+    margin:0 0 6px;
+    font-weight:700;
+    letter-spacing:-0.01em;
+    background:var(--grad);
+    background-size:200% auto;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    animation:shimmer 8s linear infinite alternate;
+  }
+  header p{
+    margin:0;
+    color:var(--text-dim);
+    font-size:15px;
+    max-width:640px;
+  }
+  .lang-switch{
+    flex:none;
+    display:flex;
+    border:1px solid var(--border);
+    border-radius:20px;
+    overflow:hidden;
+    position:relative;
+    z-index:1;
+  }
+  .lang-btn{
+    background:transparent;
+    border:none;
+    color:var(--text-dim);
+    padding:8px 16px;
+    font-size:13px;
+    cursor:pointer;
+    font-family:inherit;
+    font-weight:600;
+    transition:all .25s ease;
+  }
+  .lang-btn.active{background:var(--grad);color:#0a0a0f;}
+  .lang-btn:not(.active):hover{color:var(--text);background:#ffffff0d;}
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:32px 24px 80px;
+    display:grid;
+    grid-template-columns:1fr 420px;
+    gap:28px;
+    align-items:start;
+  }
+  @media (max-width:960px){ .wrap{grid-template-columns:1fr;} }
+
+  .section{
+    transition:border-color .25s ease, box-shadow .25s ease;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px 22px;
+    margin-bottom:18px;
+  }
+  .section h2{
+    font-size:14px;
+    margin:0 0 16px;
+    color:var(--accent);
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section h2 .num{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-dim);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:1px 6px;
+  }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:520px){ .grid2{grid-template-columns:1fr;} }
+
+  label{ display:block; font-size:13px; color:var(--text-dim); margin-bottom:6px; }
+  select, input[type=text], textarea{
+    width:100%;
+    background:var(--bg-panel-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:14px;
+    font-family:inherit;
+    margin-bottom:14px;
+  }
+  select:focus, input:focus, textarea:focus{ outline:none; border-color:var(--accent); }
+  textarea{resize:vertical;min-height:64px;}
+
+  .presets{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
+  .preset-btn{
+    background:var(--accent-soft);
+    border:1px solid #ffffff22;
+    color:var(--text);
+    border-radius:20px;
+    padding:6px 14px;
+    font-size:12.5px;
+    cursor:pointer;
+    font-family:inherit;
+    transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    position:relative;
+  }
+  .preset-btn:hover{
+    border-color:transparent;
+    background:var(--grad);
+    background-size:200% auto;
+    color:#0a0a0f;
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px -6px #b24ff088;
+    animation:shimmer 3s linear infinite;
+  }
+  .preset-btn:active{ transform:translateY(0) scale(.97); }
+
+  .type-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:8px; }
+  .type-chip{
+    border:1px solid var(--border);
+    background:var(--bg-panel-2);
+    color:var(--text-dim);
+    border-radius:8px;
+    padding:10px 8px;
+    font-size:13px;
+    text-align:center;
+    cursor:pointer;
+    transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease, background .3s ease;
+  }
+  .type-chip:hover{ border-color:#ffffff33; color:var(--text); transform:translateY(-1px); }
+  .type-chip.active{
+    border-color:transparent;
+    color:#0a0a0f;
+    background:var(--grad);
+    background-size:200% auto;
+    font-weight:700;
+    box-shadow:0 6px 20px -6px #b24ff099;
+    animation:pulseRing 1.8s ease-out 1, fadeInUp .3s ease;
+  }
+
+  .quality-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; margin-bottom:6px; }
+  .quality-item{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-dim); cursor:pointer; transition:color .2s ease; }
+  .quality-item:hover{ color:var(--text); }
+  .quality-item input{width:auto;margin:0;accent-color:var(--purple);}
+
+  .output-panel{
+    position:sticky;
+    top:24px;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:22px;
+    box-shadow:0 20px 60px -30px #4f7dff33;
+  }
+  .output-panel h2{ font-size:14px; color:var(--accent); margin:0 0 4px; }
+  .output-panel .sub{ font-size:12px; color:var(--text-dim); margin-bottom:12px; }
+  .prompt-box{
+    background:var(--bg-panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px;
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--text);
+    white-space:pre-wrap;
+    word-break:break-word;
+    min-height:110px;
+    margin-bottom:10px;
+    direction:ltr;
+    text-align:left;
+  }
+  @keyframes flashGlow{
+    0%{ box-shadow:0 0 0 0 #b24ff000; border-color:var(--purple); }
+    30%{ box-shadow:0 0 18px 2px #b24ff055; }
+    100%{ box-shadow:0 0 0 0 #b24ff000; border-color:var(--border); }
+  }
+  .prompt-box.flash{ animation: flashGlow .6s ease; }
+
+  .translation-box{
+    background:var(--bg-panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px;
+    font-size:13.5px;
+    color:var(--text);
+    white-space:pre-wrap;
+    word-break:break-word;
+    min-height:70px;
+    margin-bottom:10px;
+    direction:rtl;
+    text-align:right;
+  }
+  .copy-btn{
+    width:100%;
+    background:var(--grad);
+    background-size:200% auto;
+    background-position:0% 50%;
+    color:#0a0a0f;
+    border:none;
+    border-radius:8px;
+    padding:12px;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    font-family:inherit;
+    margin-bottom:22px;
+    transition:transform .18s ease, box-shadow .18s ease, background-position .4s ease;
+    box-shadow:0 8px 24px -10px #b24ff088;
+  }
+  .copy-btn:hover{ background-position:100% 50%; transform:translateY(-2px); box-shadow:0 10px 28px -8px #ffb34799; }
+  .copy-btn:active{ transform:translateY(0) scale(.97); }
+  .copy-btn.copied{ background:linear-gradient(120deg,#4fd68c,#3fbf7a); animation:pulseRing .6s ease-out 1; }
+
+  .neg-label{ font-size:12.5px; color:var(--accent-deep); margin-bottom:8px; font-weight:700; }
+  .neg-box{
+    background:var(--accent-deep-soft);
+    border:1px solid var(--accent-deep);
+    border-radius:8px;
+    padding:12px;
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--text);
+    direction:ltr;
+    text-align:left;
+    margin-bottom:10px;
+  }
+  .copy-btn-secondary{
+    width:100%;
+    background:transparent;
+    border:1px solid var(--accent-deep);
+    color:var(--accent-deep);
+    border-radius:8px;
+    padding:9px;
+    font-size:13px;
+    cursor:pointer;
+    font-family:inherit;
+    margin-bottom:22px;
+    transition:transform .18s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
+  }
+  .copy-btn-secondary:hover{
+    background:var(--accent-deep);
+    color:#0a0a0f;
+    transform:translateY(-2px);
+    box-shadow:0 8px 22px -10px #ff4f7d99;
+  }
+  .copy-btn-secondary:active{ transform:translateY(0) scale(.97); }
+
+  .platform-note{ font-size:12.5px; color:var(--text-dim); border-top:1px solid var(--border); padding-top:14px; }
+  footer{ text-align:center; color:var(--text-dim); font-size:12.5px; padding:0 24px 40px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <img class="app-icon" src="icon-192.png" alt="app icon">
+    <div class="header-text">
+      <h1 data-i18n="title"></h1>
+      <p data-i18n="subtitle"></p>
+    </div>
+    <div class="lang-switch">
+      <button class="lang-btn" id="btnFa">فارسی</button>
+      <button class="lang-btn" id="btnEn">English</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="form-col">
+
+    <div class="section">
+      <h2><span class="num">۱</span> <span data-i18n="sec1_title"></span></h2>
+      <div class="type-grid" id="typeGrid"></div>
+    </div>
+
+    <div class="section">
+      <h2><span class="num">۲</span> <span data-i18n="sec2_title"></span></h2>
+      <div class="presets" id="presetRow"></div>
+      <label data-i18n="sec2_hint" style="margin-top:4px;"></label>
+    </div>
+
+    <div class="section">
+      <h2><span class="num">۳</span> <span data-i18n="sec3_title"></span></h2>
+      <label data-i18n="subject_label"></label>
+      <textarea id="subject" data-i18n-placeholder="subject_placeholder"></textarea>
+      <label data-i18n="setting_label"></label>
+      <input type="text" id="setting" data-i18n-placeholder="setting_placeholder">
+      <label data-i18n="translate_hint" style="margin-top:-6px;font-size:12px;"></label>
+    </div>
+
+    <div class="section">
+      <h2><span class="num">۴</span> <span data-i18n="sec4_title"></span></h2>
+      <div class="grid2">
+        <div><label data-i18n="camera_label"></label><select id="camera"></select></div>
+        <div><label data-i18n="lens_label"></label><select id="lens"></select></div>
+      </div>
+      <div class="grid2">
+        <div><label data-i18n="aperture_label"></label><select id="aperture"></select></div>
+        <div><label data-i18n="composition_label"></label><select id="composition"></select></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><span class="num">۵</span> <span data-i18n="sec5_title"></span></h2>
+      <div class="grid2">
+        <div><label data-i18n="lighting_label"></label><select id="lighting"></select></div>
+        <div><label data-i18n="time_label"></label><select id="timeOfDay"></select></div>
+      </div>
+      <label data-i18n="filter_label"></label>
+      <select id="filter"></select>
+    </div>
+
+    <div class="section">
+      <h2><span class="num">۶</span> <span data-i18n="sec6_title"></span></h2>
+      <div class="grid2">
+        <div><label data-i18n="film_label"></label><select id="film"></select></div>
+        <div><label data-i18n="mood_label"></label><select id="mood"></select></div>
+      </div>
+      <label data-i18n="extra_label"></label>
+      <textarea id="extraNotes" data-i18n-placeholder="extra_placeholder"></textarea>
+    </div>
+
+    <div class="section">
+      <h2><span class="num">۷</span> <span data-i18n="sec7_title"></span></h2>
+      <div class="quality-grid" id="qualityGrid"></div>
+    </div>
+
+    <div class="section">
+      <h2><span class="num">۸</span> <span data-i18n="sec8_title"></span></h2>
+      <div class="grid2">
+        <div>
+          <label data-i18n="platform_label"></label>
+          <select id="platform">
+            <option value="midjourney">Midjourney</option>
+            <option value="dalle">DALL·E 3</option>
+            <option value="sd">Stable Diffusion</option>
+            <option value="generic">Leonardo / Ideogram / Flux</option>
+          </select>
+        </div>
+        <div>
+          <label data-i18n="aspect_label"></label>
+          <select id="aspect">
+            <option value="1:1" data-i18n="aspect_1_1"></option>
+            <option value="4:5" data-i18n="aspect_4_5"></option>
+            <option value="3:2" data-i18n="aspect_3_2"></option>
+            <option value="16:9" data-i18n="aspect_16_9"></option>
+            <option value="9:16" data-i18n="aspect_9_16"></option>
+            <option value="2:3" data-i18n="aspect_2_3"></option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="output-panel">
+    <h2 data-i18n="output_title"></h2>
+    <div class="sub" data-i18n="output_sub"></div>
+    <div class="prompt-box" id="promptOut"></div>
+    <div class="sub" id="translateStatus" style="display:none;"></div>
+    <button class="copy-btn" id="copyBtn" data-i18n="copy_btn"></button>
+    <div class="sub" id="copyFallbackHint" style="display:none;margin-top:-16px;margin-bottom:16px;"></div>
+    <button class="copy-btn-secondary" id="retranslateBtn" data-i18n="retranslate_btn" style="margin-bottom:10px;"></button>
+    <div class="sub" id="retranslateHint" data-i18n="retranslate_hint" style="margin-bottom:18px;"></div>
+
+    <h2 data-i18n="translation_title" style="margin-top:4px;"></h2>
+    <div class="translation-box" id="translationOut"></div>
+
+    <div id="negWrap" style="display:none;">
+      <div class="neg-label" data-i18n="neg_label"></div>
+      <div class="neg-box" id="negOut"></div>
+      <button class="copy-btn-secondary" id="copyNegBtn" data-i18n="copy_neg_btn"></button>
+    </div>
+
+    <div class="platform-note" id="platformNote"></div>
+  </div>
+</div>
+
+<footer data-i18n="footer_text"></footer>
+
+<script>
+// ---------------- i18n ----------------
+let LANG = 'fa';
+const STRINGS = {
+  title: {fa:'Shutter — سیستم پرامپت‌ساز حرفه‌ای عکاسی', en:'Shutter — Professional Photography Prompt Builder'},
+  subtitle: {fa:'فیلدها رو پر کن تا یک پرامپت کامل و حرفه‌ای عکاسی — با دوربین، لنز، نور، فیلتر و سبک درست — برای Midjourney، DALL·E یا Stable Diffusion ساخته بشه.', en:'Fill in the fields to build a complete, professional photography prompt — with the right camera, lens, lighting, filter and style — for Midjourney, DALL·E or Stable Diffusion.'},
+  sec1_title: {fa:'نوع عکاسی', en:'Photography Type'},
+  sec2_title: {fa:'پیش‌تنظیم سریع (اختیاری)', en:'Quick Presets (optional)'},
+  sec2_hint: {fa:'می‌تونی بعد از انتخاب پیش‌تنظیم، هر فیلد رو دستی تغییر بدی.', en:'You can manually adjust any field after choosing a preset.'},
+  sec3_title: {fa:'سوژه و صحنه', en:'Subject & Scene'},
+  subject_label: {fa:'سوژه اصلی (مثلاً: دفترچه چرمی دست‌دوز / یک ورزشکار دونده / زنی جوان با لباس مجلسی)', en:'Main subject (e.g. a handmade leather notebook / a runner in motion / a young woman in evening wear)'},
+  subject_placeholder: {fa:'سوژه یا محصول یا شخص مورد نظر رو توصیف کن...', en:'Describe the subject, product, or person...'},
+  setting_label: {fa:'محیط / پس‌زمینه', en:'Setting / Background'},
+  setting_placeholder: {fa:'مثلاً: میز چوبی طبیعی، استادیوم ورزشی، پس‌زمینه سفید...', en:'e.g. a natural wooden table, a sports stadium, a white background...'},
+  sec4_title: {fa:'دوربین و لنز', en:'Camera & Lens'},
+  camera_label: {fa:'مدل دوربین', en:'Camera Model'},
+  lens_label: {fa:'لنز', en:'Lens'},
+  aperture_label: {fa:'دیافراگم (Aperture)', en:'Aperture'},
+  composition_label: {fa:'زاویه و ترکیب‌بندی', en:'Angle & Composition'},
+  sec5_title: {fa:'نور، فیلتر و زمان', en:'Lighting, Filter & Time'},
+  lighting_label: {fa:'نوع نورپردازی', en:'Lighting Type'},
+  time_label: {fa:'زمان روز', en:'Time of Day'},
+  filter_label: {fa:'فیلتر لنز (اختیاری)', en:'Lens Filter (optional)'},
+  sec6_title: {fa:'سبک بصری و رنگ', en:'Visual Style & Color'},
+  film_label: {fa:'فیلم / گریدینگ رنگ', en:'Film / Color Grade'},
+  mood_label: {fa:'حس‌وحال کلی (Mood)', en:'Overall Mood'},
+  extra_label: {fa:'یادداشت آزاد اضافه (اختیاری — هر جزئیات دیگه‌ای که مد نظرته)', en:'Additional free notes (optional — any other detail you want included)'},
+  extra_placeholder: {fa:'مثلاً: لوگو محصول باید دیده بشه، مدل باید لبخند بزنه و...', en:'e.g. the product logo should be visible, the model should be smiling...'},
+  sec7_title: {fa:'تقویت‌کننده‌های کیفیت', en:'Quality Boosters'},
+  sec8_title: {fa:'پلتفرم و فرمت خروجی', en:'Platform & Output Format'},
+  platform_label: {fa:'پلتفرم هدف', en:'Target Platform'},
+  aspect_label: {fa:'نسبت ابعاد', en:'Aspect Ratio'},
+  aspect_1_1: {fa:'۱:۱ (مربع)', en:'1:1 (square)'},
+  aspect_4_5: {fa:'۴:۵ (پست اینستاگرام)', en:'4:5 (Instagram post)'},
+  aspect_3_2: {fa:'۳:۲ (استاندارد عکاسی)', en:'3:2 (standard photo)'},
+  aspect_16_9: {fa:'۱۶:۹ (افقی/بنر)', en:'16:9 (landscape/banner)'},
+  aspect_9_16: {fa:'۹:۱۶ (استوری/ریلز)', en:'9:16 (story/reel)'},
+  aspect_2_3: {fa:'۲:۳ (عمودی پرتره)', en:'2:3 (portrait vertical)'},
+  output_title: {fa:'پرامپت نهایی', en:'Final Prompt'},
+  output_sub: {fa:'(همیشه به انگلیسی — برای بهترین نتیجه در موتورهای تولید تصویر)', en:'(always in English — for best results with image models)'},
+  copy_btn: {fa:'کپی پرامپت', en:'Copy Prompt'},
+  copy_btn_copied: {fa:'کپی شد ✓', en:'Copied ✓'},
+  translation_title: {fa:'ترجمه فارسی پرامپت', en:'Persian Translation of Prompt'},
+  neg_label: {fa:'Negative Prompt (برای Stable Diffusion)', en:'Negative Prompt (for Stable Diffusion)'},
+  copy_neg_btn: {fa:'کپی negative prompt', en:'Copy Negative Prompt'},
+  footer_text: {fa:'ابزار شخصی پرامپت‌سازی عکاسی — همه‌چیز داخل مرورگر خودت اجرا می‌شه، چیزی به سروری ارسال نمی‌شه.', en:'A personal photography prompt-building tool — everything runs in your own browser, nothing is sent to any server.'},
+  placeholder_out: {fa:'فیلدهای سمت راست رو پر کن؛ پرامپت اینجا خودکار ساخته می‌شه.', en:'Fill in the fields on the left; the prompt will be built here automatically.'},
+  translate_hint: {fa:'می‌تونی این فیلدها رو فارسی بنویسی؛ قبل از ساخت پرامپت نهایی خودکار به انگلیسی ترجمه می‌شن.', en:'You can type these fields in Persian; they are auto-translated to English before the final prompt is built.'},
+  translating_note: {fa:'در حال ترجمه فیلدهای فارسی به انگلیسی...', en:'Translating Persian fields to English...'},
+  translate_failed_note: {fa:'ترجمه خودکار در دسترس نبود (اتصال اینترنت رو چک کن)؛ فعلاً از همون متن فارسی استفاده شد.', en:"Auto-translation wasn't available (check your internet connection); the original Persian text was used for now."},
+  copy_fallback_hint: {fa:'اگه دکمه کپی کار نکرد، متن بالا رو دستی انتخاب و کپی کن (Ctrl+C).', en:"If the copy button doesn't work, select the text above manually and copy it (Ctrl+C)."},
+  retranslate_btn: {fa:'ترجمه دقیق مجدد به انگلیسی', en:'Re-translate to English accurately'},
+  retranslate_hint: {fa:'اگه توی پرامپت بالا جمله فارسی باقی مونده، این دکمه رو بزن تا دوباره و از یک سرویس آنلاین ترجمه بشه.', en:'If any Persian sentence is still left in the prompt above, click this to re-translate it online.'},
+  retranslate_none: {fa:'همه‌چیز از قبل به انگلیسی ترجمه شده.', en:'Everything is already translated to English.'},
+  note_mj: {fa:'برای Midjourney: پرامپت رو مستقیم بعد از /imagine وارد کن. پارامتر --style raw خروجی رو به سمت واقع‌گرایی عکاسانه (به‌جای سبک هنری پیش‌فرض) می‌بره.', en:'For Midjourney: paste the prompt directly after /imagine. The --style raw parameter pushes the output toward photographic realism instead of the default artistic style.'},
+  note_dalle: {fa:'برای DALL·E 3: این متن رو به‌صورت یک جمله کامل و طبیعی وارد کن؛ DALL·E به توصیف روایی بهتر از کلیدواژه‌های تکه‌تکه پاسخ می‌ده.', en:'For DALL·E 3: enter this as a natural, full sentence; DALL·E responds better to narrative description than to fragmented keywords.'},
+  note_sd: {fa:'برای Stable Diffusion: پرامپت بالا رو در فیلد Positive Prompt و پرامپت زیر رو در فیلد Negative Prompt وارد کن. نسبت ابعاد رو از تنظیمات width/height مطابق نسبت انتخابی تنظیم کن.', en:'For Stable Diffusion: put the prompt above in the Positive Prompt field and the one below in the Negative Prompt field. Set width/height to match your chosen aspect ratio.'},
+  note_generic: {fa:'برای Leonardo / Ideogram / Flux: این پرامپت به‌صورت مستقیم قابل استفاده است؛ در صورت وجود گزینه realism/photo mode در ابزار، آن را فعال کن.', en:'For Leonardo / Ideogram / Flux: this prompt can be used directly; enable a realism/photo mode option in the tool if available.'},
+};
+
+function applyI18n(){
+  document.getElementById('htmlRoot').lang = LANG;
+  document.getElementById('htmlRoot').dir = LANG==='fa' ? 'rtl' : 'ltr';
+  document.body.classList.toggle('lang-en', LANG==='en');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(STRINGS[key]) el.textContent = STRINGS[key][LANG];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-placeholder');
+    if(STRINGS[key]) el.placeholder = STRINGS[key][LANG];
+  });
+  document.getElementById('btnFa').classList.toggle('active', LANG==='fa');
+  document.getElementById('btnEn').classList.toggle('active', LANG==='en');
+  document.getElementById('promptOut').textContent === '' ;
+}
+
+document.getElementById('btnFa').onclick = ()=>{ LANG='fa'; rebuildAll(); };
+document.getElementById('btnEn').onclick = ()=>{ LANG='en'; rebuildAll(); };
+
+// ---------------- Data (each option: [enValue, faLabel]) ----------------
+const TYPES = [
+  {id:'studio', fa:'استودیویی', en:'Studio'},
+  {id:'portrait', fa:'پرتره', en:'Portrait'},
+  {id:'product', fa:'محصول', en:'Product'},
+  {id:'advertising', fa:'تبلیغاتی', en:'Advertising'},
+  {id:'fashion', fa:'مد / فشن', en:'Fashion'},
+  {id:'nature', fa:'طبیعت / لندسکیپ', en:'Nature / Landscape'},
+  {id:'sports', fa:'ورزشی', en:'Sports'},
+  {id:'street', fa:'خیابانی / مستند', en:'Street / Documentary'},
+  {id:'food', fa:'غذا', en:'Food'},
+  {id:'architecture', fa:'معماری', en:'Architecture'},
+  {id:'wildlife', fa:'حیات وحش', en:'Wildlife'},
+  {id:'macro', fa:'ماکرو', en:'Macro'},
+  {id:'night', fa:'شب / نجومی', en:'Night / Astro'},
+  {id:'event', fa:'مراسم / رویداد', en:'Event'},
+];
+
+const CAMERAS = [
+  ['Canon EOS R5','دیجیتال، همه‌منظوره'],
+  ['Canon EOS R3','دیجیتال، سرعت بالا/ورزشی'],
+  ['Nikon Z9','دیجیتال، حرفه‌ای/ورزشی'],
+  ['Sony A7R V','دیجیتال، رزولوشن بالا'],
+  ['Sony A9 II','دیجیتال، اکشن/ورزشی'],
+  ['Hasselblad X2D 100C','مدیوم‌فرمت، استودیویی'],
+  ['Fujifilm GFX100 II','مدیوم‌فرمت، تجاری'],
+  ['Phase One XF IQ4','مدیوم‌فرمت، تبلیغاتی حرفه‌ای'],
+  ['Leica M11','رنج‌فایندر، خیابانی/مستند'],
+  ['Leica Q3','کامپکت حرفه‌ای'],
+  ['Leica M6 (فیلم)','آنالوگ، خیابانی'],
+  ['Contax T2 (فیلم)','آنالوگ، کامپکت'],
+  ['Hasselblad 500C/M (فیلم)','آنالوگ، مدیوم‌فرمت'],
+  ['Mamiya RZ67 (فیلم)','آنالوگ، پرتره/فشن'],
+  ['Polaroid SX-70 (فیلم فوری)','آنالوگ، حس نوستالژیک'],
+  ['iPhone 15 Pro Max','موبایل، لایف‌استایل'],
+];
+
+const LENSES = [
+  ['14mm fisheye/ultra-wide','فیش‌آی/فوق‌عریض'],
+  ['16-35mm wide-angle zoom','زوم عریض'],
+  ['24mm wide-angle','عریض'],
+  ['24mm tilt-shift','تیلت-شیفت (معماری)'],
+  ['35mm','استاندارد-عریض'],
+  ['50mm ("nifty fifty")','استاندارد'],
+  ['85mm f/1.4 portrait lens','پرتره'],
+  ['100mm macro','ماکرو'],
+  ['135mm portrait-telephoto','پرتره تله'],
+  ['200mm telephoto','تله'],
+  ['400mm super-telephoto','سوپرتله (ورزشی)'],
+  ['600mm super-telephoto','سوپرتله (حیات وحش)'],
+];
+
+const APERTURES = ['f/1.2','f/1.4','f/1.8','f/2.8','f/4','f/5.6','f/8','f/11','f/16','f/22'];
+
+const COMPOSITIONS = [
+  ['rule of thirds composition','قانون یک‌سوم'],
+  ['centered symmetrical composition','تقارن مرکزی'],
+  ['close-up shot','کلوزآپ'],
+  ['extreme close-up','کلوزآپ شدید'],
+  ['wide establishing shot','نمای باز'],
+  ['low-angle shot','زاویه پایین'],
+  ["high-angle bird's-eye shot",'زاویه بالا'],
+  ['dutch angle','زاویه کج/داچ'],
+  ['leading lines composition','خطوط هادی'],
+  ['negative space composition','فضای منفی'],
+  ['flat lay, top-down','فلت‌لی از بالا'],
+  ['over-the-shoulder shot','از پشت شانه'],
+];
+
+const LIGHTING = [
+  ['golden hour sunlight','ساعت طلایی'],
+  ['blue hour twilight','ساعت آبی'],
+  ['harsh midday sunlight','نور شدید ظهر'],
+  ['soft overcast diffused light','نور پخش ابری'],
+  ['studio softbox lighting, three-point setup','استودیویی سه‌نقطه‌ای'],
+  ['ring light','رینگ‌لایت'],
+  ['beauty dish lighting','بیوتی‌دیش'],
+  ['Rembrandt lighting','نورپردازی رامبراند'],
+  ['butterfly lighting','نورپردازی پروانه‌ای'],
+  ['split lighting','نورپردازی اسپلیت'],
+  ['high-key lighting, bright even exposure','های‌کی روشن'],
+  ['low-key lighting, dramatic shadows','لوکی تیره و دراماتیک'],
+  ['rim light / backlighting','نور حاشیه/پشت'],
+  ['neon ambient lighting','نور نئون محیط'],
+  ['candlelight','نور شمع'],
+  ['moonlight, long exposure','نور مهتاب/نوردهی طولانی'],
+  ['on-camera flash fill light','فلش پرکننده'],
+  ['soft natural window light','نور طبیعی پنجره'],
+];
+
+const TIMES = [
+  ['dawn','سپیده‌دم'],['golden hour, early morning','صبح زود'],['midday','ظهر'],
+  ['late afternoon','عصر'],['dusk','غروب'],['night','شب'],['indoors, no specific time','داخل/بدون زمان خاص']
+];
+
+const FILTERS = [
+  ['no filter','بدون فیلتر'],
+  ['polarizing filter (CPL) for deep sky and reflections','پلاریزه'],
+  ['ND filter for long exposure','ND برای نوردهی طولانی'],
+  ['UV protective filter','UV'],
+  ['warm color gel','ژل رنگی گرم'],
+  ['red color gel accent','ژل رنگی قرمز'],
+  ['blue color gel accent','ژل رنگی آبی'],
+  ['star cross-screen filter','فیلتر ستاره‌ای'],
+  ['vintage lomo-style filter','فیلتر وینتیج/لومو'],
+  ['infrared filter','فیلتر مادون‌قرمز'],
+  ['soft diffusion filter','فیلتر نرم‌کننده'],
+];
+
+const FILMS = [
+  ['natural true-to-life color, digital clean look','رنگ طبیعی دیجیتال'],
+  ['shot on Kodak Portra 400 film','کداک پورترا ۴۰۰'],
+  ['shot on Kodak Ektar 100 film','کداک اکتار ۱۰۰'],
+  ['shot on Fujifilm Velvia 50, vivid saturated colors','فوجی ولویا (رنگ اشباع)'],
+  ['shot on Ilford HP5 Plus, black and white','ایلفورد HP5 (سیاه‌وسفید)'],
+  ['shot on Cinestill 800T, tungsten night look','سینستیل ۸۰۰T (شب)'],
+  ['cinematic teal-and-orange color grading','گریدینگ سینمایی نارنجی-آبی'],
+  ['warm vintage faded tones','رنگ‌های وینتیج محو'],
+  ['cool desaturated tones','رنگ‌های سرد کم‌اشباع'],
+  ['high contrast black and white','سیاه‌وسفید کنتراست بالا'],
+  ['soft pastel color palette','پالت رنگ پاستلی'],
+];
+
+const MOODS = [
+  ['dramatic and intense','دراماتیک و پرشور'],
+  ['calm and serene','آرام و آرامش‌بخش'],
+  ['energetic and dynamic','پرانرژی و پویا'],
+  ['moody and mysterious','مرموز و تیره'],
+  ['joyful and vibrant','شاد و پرانرژی'],
+  ['elegant and luxurious','شیک و لوکس'],
+  ['minimal and clean','مینیمال و تمیز'],
+  ['nostalgic','نوستالژیک'],
+];
+
+const QUALITY_TAGS = [
+  ['8K resolution','رزولوشن ۸K'],
+  ['ultra-detailed','فوق‌جزئیات'],
+  ['tack sharp focus','فوکوس کاملاً شارپ'],
+  ['award-winning photography','عکاسی جایزه‌گرفته'],
+  ['National Geographic style','سبک نشنال جئوگرافیک'],
+  ['Vogue editorial style','سبک ادیتوریال ووگ'],
+  ['photorealistic, real photograph not a render','فوتورئال، نه رندر'],
+  ['authentic unretouched skin/material texture','بافت طبیعی و واقعی'],
+];
+
+const PRESETS = [
+  {fa:'پرتره کلاسیک استودیویی', en:'Classic Studio Portrait', type:'portrait', camera:'Hasselblad X2D 100C', lens:'85mm f/1.4 portrait lens', aperture:'f/1.8', lighting:'Rembrandt lighting', composition:'centered symmetrical composition', film:'shot on Kodak Portra 400 film', mood:'elegant and luxurious'},
+  {fa:'محصول تجاری روی پس‌زمینه سفید', en:'Commercial Product on White', type:'product', camera:'Phase One XF IQ4', lens:'100mm macro', aperture:'f/11', lighting:'high-key lighting, bright even exposure', composition:'centered symmetrical composition', film:'natural true-to-life color, digital clean look', mood:'minimal and clean'},
+  {fa:'عکس ورزشی پرحرکت', en:'High-Action Sports Shot', type:'sports', camera:'Canon EOS R3', lens:'400mm super-telephoto', aperture:'f/2.8', lighting:'harsh midday sunlight', composition:'wide establishing shot', film:'natural true-to-life color, digital clean look', mood:'energetic and dynamic'},
+  {fa:'منظره طبیعت، ساعت طلایی', en:'Golden-Hour Landscape', type:'nature', camera:'Sony A7R V', lens:'16-35mm wide-angle zoom', aperture:'f/8', lighting:'golden hour sunlight', composition:'rule of thirds composition', film:'shot on Fujifilm Velvia 50, vivid saturated colors', mood:'calm and serene'},
+  {fa:'غذای رستورانی', en:'Restaurant Food Shot', type:'food', camera:'Sony A7R V', lens:'50mm ("nifty fifty")', aperture:'f/2.8', lighting:'soft natural window light', composition:"high-angle bird's-eye shot", film:'shot on Kodak Portra 400 film', mood:'joyful and vibrant'},
+  {fa:'خیابانی/مستند سیاه‌وسفید', en:'Black & White Street/Doc', type:'street', camera:'Leica M6 (فیلم)', lens:'35mm', aperture:'f/5.6', lighting:'harsh midday sunlight', composition:'leading lines composition', film:'shot on Ilford HP5 Plus, black and white', mood:'moody and mysterious'},
+];
+
+// ---------------- Rendering ----------------
+let selectedType = 'portrait';
+
+function optionLabel(enValue, faLabel){
+  return LANG==='fa' ? (faLabel+' — '+enValue) : enValue;
+}
+function fillSelect(id, arr, plain=false){
+  const el = document.getElementById(id);
+  const prevVal = el.value;
+  el.innerHTML = '';
+  arr.forEach(item=>{
+    const opt = document.createElement('option');
+    if(plain){ opt.value=item; opt.textContent=item; }
+    else { opt.value=item[0]; opt.textContent = optionLabel(item[0], item[1]); }
+    el.appendChild(opt);
+  });
+  if(prevVal){ const has=[...el.options].some(o=>o.value===prevVal); if(has) el.value=prevVal; }
+}
+
+function renderTypeGrid(){
+  const typeGrid = document.getElementById('typeGrid');
+  typeGrid.innerHTML='';
+  TYPES.forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className='type-chip'+(t.id===selectedType?' active':'');
+    chip.textContent = LANG==='fa'?t.fa:t.en;
+    chip.dataset.id=t.id;
+    chip.onclick=()=>{
+      selectedType=t.id;
+      document.querySelectorAll('.type-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      generate();
+    };
+    typeGrid.appendChild(chip);
+  });
+}
+
+function renderPresets(){
+  const presetRow = document.getElementById('presetRow');
+  presetRow.innerHTML='';
+  PRESETS.forEach(p=>{
+    const btn=document.createElement('button');
+    btn.className='preset-btn';
+    btn.textContent = LANG==='fa'?p.fa:p.en;
+    btn.onclick=()=>{
+      selectedType=p.type;
+      renderTypeGrid();
+      document.querySelectorAll('.type-chip').forEach(c=>c.classList.toggle('active', c.dataset.id===p.type));
+      setSelectValue('camera', p.camera);
+      setSelectValue('lens', p.lens);
+      setSelectValue('aperture', p.aperture);
+      setSelectValue('lighting', p.lighting);
+      setSelectValue('composition', p.composition);
+      setSelectValue('film', p.film);
+      setSelectValue('mood', p.mood);
+      generate();
+    };
+    presetRow.appendChild(btn);
+  });
+}
+function setSelectValue(id, value){
+  const el = document.getElementById(id);
+  for(const opt of el.options){ if(opt.value===value){ el.value=value; return; } }
+}
+
+function renderQualityGrid(){
+  const qualityGrid = document.getElementById('qualityGrid');
+  const checkedVals = new Set(Array.from(document.querySelectorAll('.quality-item input:checked')).map(i=>i.dataset.val));
+  qualityGrid.innerHTML='';
+  QUALITY_TAGS.forEach((q,i)=>{
+    const wrap=document.createElement('label');
+    wrap.className='quality-item';
+    const isChecked = checkedVals.size ? checkedVals.has(q[0]) : i<2;
+    wrap.innerHTML = `<input type="checkbox" data-val="${q[0]}" ${isChecked?'checked':''}> ${LANG==='fa'?q[1]:q[0]}`;
+    qualityGrid.appendChild(wrap);
+  });
+  qualityGrid.querySelectorAll('input').forEach(inp=>inp.addEventListener('change', generate));
+}
+
+function fillAllSelects(){
+  fillSelect('camera', CAMERAS);
+  fillSelect('lens', LENSES);
+  fillSelect('aperture', APERTURES, true);
+  fillSelect('composition', COMPOSITIONS);
+  fillSelect('lighting', LIGHTING);
+  fillSelect('timeOfDay', TIMES);
+  fillSelect('filter', FILTERS);
+  fillSelect('film', FILMS);
+  fillSelect('mood', MOODS);
+}
+
+function rebuildAll(){
+  applyI18n();
+  fillAllSelects();
+  renderTypeGrid();
+  renderPresets();
+  renderQualityGrid();
+  generate();
+}
+
+// ---------------- Translation (Persian free-text -> English) ----------------
+const translationCache = {}; // { originalPersianText: englishText }
+function containsPersian(t){ return /[\u0600-\u06FF]/.test(t || ''); }
+function cachedOrOriginal(text){
+  if(!text) return text;
+  if(!containsPersian(text)) return text;
+  return translationCache[text] || text; // used until real translation arrives
+}
+async function translateViaGoogle(text){
+  try{
+    const res = await fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=fa&tl=en&dt=t&q='+encodeURIComponent(text));
+    if(!res.ok) return null;
+    const data = await res.json();
+    if(Array.isArray(data) && Array.isArray(data[0])){
+      const joined = data[0].map(chunk=>chunk[0]).join('').trim();
+      if(joined) return joined;
+    }
+  }catch(e){ /* blocked/offline */ }
+  return null;
+}
+async function translateViaMyMemory(text){
+  try{
+    const res = await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(text)+'&langpair=fa|en');
+    if(!res.ok) return null;
+    const data = await res.json();
+    const translated = data && data.responseData && data.responseData.translatedText;
+    if(translated && translated.trim() && !/MYMEMORY WARNING/i.test(translated) && !containsPersian(translated)) return translated.trim();
+  }catch(e){ /* blocked/offline */ }
+  return null;
+}
+async function translateOne(text, force){
+  if(!text || !containsPersian(text)) return text;
+  if(!force && translationCache[text]) return translationCache[text];
+  let translated = await translateViaGoogle(text);
+  if(!translated) translated = await translateViaMyMemory(text);
+  if(translated){ translationCache[text] = translated; return translated; }
+  return null;
+}
+let translateDebounce = null;
+function scheduleTranslationCheck(){
+  clearTimeout(translateDebounce);
+  translateDebounce = setTimeout(()=>ensureTranslationsAndRegenerate(false), 700);
+}
+async function ensureTranslationsAndRegenerate(force){
+  const subject = document.getElementById('subject').value.trim();
+  const setting = document.getElementById('setting').value.trim();
+  const extra = document.getElementById('extraNotes').value.trim();
+  const candidates = [subject, setting, extra].filter(t=>t && containsPersian(t));
+  const needs = force ? candidates : candidates.filter(t=>!translationCache[t]);
+  const statusEl = document.getElementById('translateStatus');
+  if(needs.length===0){
+    if(force){
+      statusEl.style.display='block';
+      statusEl.textContent = STRINGS.retranslate_none[LANG];
+      setTimeout(()=>{ statusEl.style.display='none'; }, 2000);
+    }
+    return;
+  }
+  statusEl.style.display='block';
+  statusEl.textContent = STRINGS.translating_note[LANG];
+  const results = await Promise.all(needs.map(t=>translateOne(t, force)));
+  const anyFailed = results.some(r=>r===null);
+  statusEl.style.display = anyFailed ? 'block' : 'none';
+  if(anyFailed) statusEl.textContent = STRINGS.translate_failed_note[LANG];
+  generate();
+}
+document.getElementById('retranslateBtn').addEventListener('click', ()=>ensureTranslationsAndRegenerate(true));
+
+// ---------------- Generate ----------------
+function findFa(arr, enValue){ const f = arr.find(x=>x[0]===enValue); return f?f[1]:enValue; }
+
+function generate(){
+  const subjectRaw = document.getElementById('subject').value.trim();
+  const settingRaw = document.getElementById('setting').value.trim();
+  const subject = cachedOrOriginal(subjectRaw);
+  const setting = cachedOrOriginal(settingRaw);
+  const camera = document.getElementById('camera').value;
+  const lens = document.getElementById('lens').value;
+  const aperture = document.getElementById('aperture').value;
+  const composition = document.getElementById('composition').value;
+  const lighting = document.getElementById('lighting').value;
+  const timeOfDay = document.getElementById('timeOfDay').value;
+  const filter = document.getElementById('filter').value;
+  const film = document.getElementById('film').value;
+  const mood = document.getElementById('mood').value;
+  const extraRaw = document.getElementById('extraNotes').value.trim();
+  const extra = cachedOrOriginal(extraRaw);
+  const platform = document.getElementById('platform').value;
+  const aspect = document.getElementById('aspect').value;
+  const qualityBits = Array.from(document.querySelectorAll('.quality-item input:checked')).map(i=>i.dataset.val);
+  const typeObj = TYPES.find(t=>t.id===selectedType);
+
+  const parts = [];
+  parts.push(subject || (typeObj.en+' photography'));
+  if(setting) parts.push('in '+setting);
+  parts.push(composition);
+  if(filter !== 'no filter') parts.push('using '+filter);
+  parts.push(lighting+', '+timeOfDay);
+  parts.push('shot on '+camera+' with a '+lens+' at '+aperture);
+  parts.push(film);
+  parts.push(mood+' mood');
+  if(extra) parts.push(extra);
+  if(qualityBits.length) parts.push(qualityBits.join(', '));
+
+  let promptText = parts.filter(Boolean).join(', ');
+
+  let platformNoteKey = 'note_mj';
+  if(platform === 'midjourney'){
+    promptText += ` --ar ${aspect} --style raw --v 6.1`;
+    platformNoteKey = 'note_mj';
+  } else if(platform === 'dalle'){
+    promptText = 'A professional photograph: ' + promptText + `. Aspect ratio ${aspect}.`;
+    platformNoteKey = 'note_dalle';
+  } else if(platform === 'sd'){
+    platformNoteKey = 'note_sd';
+  } else {
+    promptText += ` — aspect ratio ${aspect}`;
+    platformNoteKey = 'note_generic';
+  }
+
+  document.getElementById('promptOut').textContent = promptText || STRINGS.placeholder_out[LANG];
+  const po = document.getElementById('promptOut');
+  po.classList.remove('flash'); void po.offsetWidth; po.classList.add('flash');
+  document.getElementById('platformNote').textContent = STRINGS[platformNoteKey][LANG];
+
+  // Persian human-readable translation of the constructed prompt (always uses original Persian wording if the user typed Persian)
+  const faParts = [];
+  faParts.push('سوژه: ' + (subjectRaw || typeObj.fa));
+  if(settingRaw) faParts.push('محیط: ' + settingRaw);
+  faParts.push('ترکیب‌بندی: ' + findFa(COMPOSITIONS, composition));
+  if(filter !== 'no filter') faParts.push('فیلتر: ' + findFa(FILTERS, filter));
+  faParts.push('نور: ' + findFa(LIGHTING, lighting) + '، زمان: ' + findFa(TIMES, timeOfDay));
+  faParts.push('دوربین: ' + camera + ' با لنز ' + findFa(LENSES, lens) + ' (' + lens + ')، دیافراگم ' + aperture);
+  faParts.push('سبک/فیلم: ' + findFa(FILMS, film));
+  faParts.push('حس‌وحال: ' + findFa(MOODS, mood));
+  if(extraRaw) faParts.push('یادداشت: ' + extraRaw);
+  if(qualityBits.length) faParts.push('کیفیت: ' + qualityBits.map(v=>findFa(QUALITY_TAGS, v)).join('، '));
+  faParts.push('نسبت ابعاد: ' + aspect);
+  document.getElementById('translationOut').textContent = faParts.join('\n');
+
+  const negWrap = document.getElementById('negWrap');
+  if(platform === 'sd'){
+    negWrap.style.display='block';
+    document.getElementById('negOut').textContent =
+      'cartoon, illustration, 3d render, cgi, painting, drawing, plastic skin, waxy skin, blurry, out of focus, low quality, low resolution, deformed, disfigured, extra limbs, bad anatomy, watermark, text, logo, signature, oversaturated, overexposed, underexposed';
+  } else {
+    negWrap.style.display='none';
+  }
+}
+
+document.addEventListener('input', (e)=>{
+  if(e.target.matches('select, textarea, input[type=text]')) generate();
+  if(e.target.matches('#subject, #setting, #extraNotes')) scheduleTranslationCheck();
+});
+document.addEventListener('change', (e)=>{
+  if(e.target.matches('select, textarea, input[type=text]')) generate();
+});
+
+// ---------------- Robust copy-to-clipboard (works even without HTTPS / clipboard permission) ----------------
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  ta.setSelectionRange(0, text.length);
+  let ok = false;
+  try{ ok = document.execCommand('copy'); }catch(e){ ok = false; }
+  document.body.removeChild(ta);
+  return ok;
+}
+function copyText(text, btn, okLabelKey, hintElId){
+  const finish = (success)=>{
+    const original = STRINGS[okLabelKey][LANG];
+    if(success){
+      btn.textContent = STRINGS.copy_btn_copied[LANG];
+      btn.classList.add('copied');
+      if(hintElId) document.getElementById(hintElId).style.display='none';
+    } else {
+      if(hintElId){
+        const hint = document.getElementById(hintElId);
+        hint.textContent = STRINGS.copy_fallback_hint[LANG];
+        hint.style.display='block';
+      }
+    }
+    setTimeout(()=>{ btn.textContent=original; btn.classList.remove('copied'); }, 1600);
+  };
+  if(!text){ finish(false); return; }
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(()=>finish(true)).catch(()=>finish(fallbackCopy(text)));
+  } else {
+    finish(fallbackCopy(text));
+  }
+}
+
+document.getElementById('copyBtn').onclick = ()=>{
+  copyText(document.getElementById('promptOut').textContent, document.getElementById('copyBtn'), 'copy_btn', 'copyFallbackHint');
+};
+document.getElementById('copyNegBtn').onclick = ()=>{
+  copyText(document.getElementById('negOut').textContent, document.getElementById('copyNegBtn'), 'copy_neg_btn', null);
+};
+
+rebuildAll();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => { /* offline caching just won't be available */ });
+  });
+}
+</script>
+</body>
+</html>
