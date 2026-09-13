@@ -5,7 +5,19 @@
     ],
     "target": {
       "namespace": "android_app",
-      "package_name": "ShutterPrompt",
+      "package_name": "io.github.aikurdestandesign.twa",
+      "sha256_cert_fingerprints": [
+        "5D:39:BD:31:0F:95:FC:EC:31:76:CA:C5:E2:01:E9:3E:FD:66:15:DD:36:B7:4C:7D:E9:F2:E2:A6:85:18:9C:A7"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "cafebazaar_twa",
+      "package_name": "io.github.aikurdestandesign.twa",
       "sha256_cert_fingerprints": [
         "5D:39:BD:31:0F:95:FC:EC:31:76:CA:C5:E2:01:E9:3E:FD:66:15:DD:36:B7:4C:7D:E9:F2:E2:A6:85:18:9C:A7"
       ]
