@@ -1,6 +1,6 @@
 {
   "packageId": "io.github.aikurdestandesign.twa",
-  "host": "aikurdestandesign.github.io",
+  "host": "aikurdestan-design.github.io",
   "name": "Shutter — پرامپت‌ساز حرفه‌ای عکاسی",
   "launcherName": "Shutter",
   "display": "standalone",
@@ -20,8 +20,8 @@
     "path": "/workspaces/ShutterPrompt/android.keystore",
     "alias": "android"
   },
-  "appVersionName": "1",
-  "appVersionCode": 1,
+  "appVersionName": "2",
+  "appVersionCode": 2,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://aikurdestan-design.github.io/ShutterPrompt/manifest.json",
@@ -43,5 +43,5 @@
   "fileHandlers": [],
   "launchHandlerClientMode": "",
   "displayOverride": [],
-  "appVersion": "1"
+  "appVersion": "2"
 }
