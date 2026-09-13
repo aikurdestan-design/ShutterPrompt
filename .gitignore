@@ -1,0 +1,15 @@
+android.keystore
+*.keystore
+app-release-bundle.aab
+app-release-signed.apk
+app-release-signed.apk.idsig
+app-release-unsigned-aligned.apk
+.gradle/
+build/
+app/
+gradle/
+gradlew
+gradlew.bat
+build.gradle
+gradle.properties
+settings.gradle
